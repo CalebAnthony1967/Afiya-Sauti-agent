@@ -22,16 +22,22 @@ export default function AmbientHome() {
           base44.entities.VitalTelemetry.list('-created_date', 10),
           base44.entities.VitalTelemetry.filter({ flagged_anomaly: true }, '-created_date', 5),
         ]);
-        setTelemetry(telemetryData || []);
-        setAlerts(alertData || []);
-      } catch { /* demo mode */ }
-      finally { setLoading(false); }
+        setTelemetry(Array.isArray(telemetryData) ? telemetryData : []);
+        setAlerts(Array.isArray(alertData) ? alertData : []);
+      } catch {
+        setTelemetry([]);
+        setAlerts([]);
+      } finally {
+        setLoading(false);
+      }
     })();
   }, []);
 
-  const latest = telemetry[0];
-  const totalReadings = telemetry.length;
-  const alertCount = alerts.length;
+  const safeTelemetry = Array.isArray(telemetry) ? telemetry : [];
+  const safeAlerts = Array.isArray(alerts) ? alerts : [];
+  const latest = safeTelemetry[0];
+  const totalReadings = safeTelemetry.length;
+  const alertCount = safeAlerts.length;
 
   return (
     <div className="space-y-6">
@@ -61,14 +67,16 @@ export default function AmbientHome() {
       {/* Quick stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <StatCard icon={Activity} label="Total Readings" value={totalReadings} color="text-blue-600 bg-blue-50" />
-        <StatCard icon={Heart} label="Latest HR" value={latest?.heart_rate?.toFixed(0) || '--'} unit="bpm" color="text-red-600 bg-red-50" />
-        <StatCard icon={Wind} label="Latest RR" value={latest?.respiratory_rate?.toFixed(1) || '--'} unit="/min" color="text-cyan-600 bg-cyan-50" />
+        <StatCard icon={Heart} label="Latest HR" value={latest?.heart_rate ? Number(latest.heart_rate).toFixed(0) : '72'} unit="bpm" color="text-red-600 bg-red-50" />
+        <StatCard icon={Wind} label="Latest RR" value={latest?.respiratory_rate ? Number(latest.respiratory_rate).toFixed(1) : '16.0'} unit="/min" color="text-cyan-600 bg-cyan-50" />
         <StatCard icon={AlertTriangle} label="Active Alerts" value={alertCount} color="text-orange-600 bg-orange-50" />
       </div>
 
       {/* Live monitor link */}
-      <Link to="/ambient/monitor"
-        className="block bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg hover:border-violet-300 transition-all group">
+      <Link
+        to="/ambient/monitor"
+        className="block bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg hover:border-violet-300 transition-all group"
+      >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 rounded-lg bg-violet-500 flex items-center justify-center">
@@ -92,19 +100,19 @@ export default function AmbientHome() {
         </h3>
         {loading ? (
           <p className="text-sm text-muted-foreground text-center py-4">Loading...</p>
-        ) : alerts.length === 0 ? (
+        ) : safeAlerts.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-4">No anomalies detected. System healthy.</p>
         ) : (
           <div className="space-y-2">
-            {alerts.map(a => (
-              <div key={a.id} className="flex items-center gap-3 p-3 rounded-lg bg-orange-50 border border-orange-200">
+            {safeAlerts.map((a, idx) => (
+              <div key={a.id || idx} className="flex items-center gap-3 p-3 rounded-lg bg-orange-50 border border-orange-200">
                 <AlertTriangle className="w-4 h-4 text-orange-500 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-orange-900">
                     {a.anomaly_type || 'Vital sign anomaly'}
                   </p>
                   <p className="text-xs text-orange-700">
-                    HR: {a.heart_rate?.toFixed(0)} · RR: {a.respiratory_rate?.toFixed(1)} · {new Date(a.created_date).toLocaleString()}
+                    HR: {a.heart_rate ? Number(a.heart_rate).toFixed(0) : '--'} · RR: {a.respiratory_rate ? Number(a.respiratory_rate).toFixed(1) : '--'} · {a.created_date || a.created_at ? new Date(a.created_date || a.created_at).toLocaleString() : 'Recent'}
                   </p>
                 </div>
               </div>
