@@ -1,0 +1,67 @@
+{
+  "name": "AuditLog",
+  "type": "object",
+  "properties": {
+    "audit_id": {
+      "type": "string"
+    },
+    "actor_id": {
+      "type": "string"
+    },
+    "actor_role": {
+      "type": "string"
+    },
+    "action_type": {
+      "type": "string",
+      "enum": [
+        "login",
+        "login_failed",
+        "logout",
+        "data_access",
+        "data_create",
+        "data_update",
+        "data_delete",
+        "ai_invoke",
+        "guardrail_trigger",
+        "admin_action",
+        "consent_change",
+        "export",
+        "vault_access",
+        "emergency_action"
+      ]
+    },
+    "resource_type": {
+      "type": "string"
+    },
+    "resource_id": {
+      "type": "string"
+    },
+    "signature_hash": {
+      "type": "string",
+      "description": "SHA-256 chained hash: hash(prev_hash + payload)"
+    },
+    "prev_hash": {
+      "type": "string"
+    },
+    "payload_snapshot": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "ip_address": {
+      "type": "string"
+    },
+    "user_agent": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "actor_id",
+    "action_type",
+    "resource_type",
+    "signature_hash"
+  ]
+}

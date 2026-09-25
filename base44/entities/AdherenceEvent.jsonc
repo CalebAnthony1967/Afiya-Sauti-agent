@@ -1,0 +1,44 @@
+{
+  "name": "AdherenceEvent",
+  "type": "object",
+  "properties": {
+    "event_id": {
+      "type": "string"
+    },
+    "profile_id": {
+      "type": "string"
+    },
+    "regimen_id": {
+      "type": "string"
+    },
+    "taken": {
+      "type": "boolean",
+      "default": false
+    },
+    "scheduled_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "recorded_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "channel": {
+      "type": "string",
+      "enum": [
+        "whatsapp",
+        "ussd",
+        "app",
+        "manual"
+      ],
+      "default": "app"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "profile_id",
+    "regimen_id"
+  ]
+}

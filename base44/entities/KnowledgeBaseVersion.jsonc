@@ -1,0 +1,69 @@
+{
+  "name": "KnowledgeBaseVersion",
+  "type": "object",
+  "properties": {
+    "version_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "moh_kenya",
+        "who",
+        "imci",
+        "icd11",
+        "peer_reviewed",
+        "approved_guideline"
+      ]
+    },
+    "source_url": {
+      "type": "string"
+    },
+    "domain_module": {
+      "type": "string"
+    },
+    "version_number": {
+      "type": "string"
+    },
+    "content_text": {
+      "type": "string"
+    },
+    "chunk_text": {
+      "type": "string",
+      "description": "For pgvector embedding in Supabase"
+    },
+    "embedding": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "description": "Vector embedding (pgvector in Supabase)"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "published": {
+      "type": "boolean",
+      "default": false
+    },
+    "published_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "title",
+    "source",
+    "domain_module"
+  ]
+}

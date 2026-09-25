@@ -1,0 +1,68 @@
+{
+  "name": "AIInferenceMetric",
+  "type": "object",
+  "properties": {
+    "inference_id": {
+      "type": "string"
+    },
+    "household_id": {
+      "type": "string"
+    },
+    "session_id": {
+      "type": "string"
+    },
+    "model_version": {
+      "type": "string"
+    },
+    "input_entropy": {
+      "type": "number"
+    },
+    "confidence_score": {
+      "type": "number"
+    },
+    "triage_assigned": {
+      "type": "string",
+      "enum": [
+        "GREEN",
+        "YELLOW",
+        "RED",
+        "UNCERTAIN_EDGE_TRIAGE"
+      ]
+    },
+    "feature_weights": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "human_override": {
+      "type": "boolean",
+      "default": false
+    },
+    "override_reason": {
+      "type": "string"
+    },
+    "guardrail_triggered": {
+      "type": "boolean",
+      "default": false
+    },
+    "guardrail_details": {
+      "type": "string"
+    },
+    "agent_name": {
+      "type": "string"
+    },
+    "agent_action": {
+      "type": "string"
+    },
+    "latency_ms": {
+      "type": "number"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "model_version",
+    "confidence_score"
+  ]
+}

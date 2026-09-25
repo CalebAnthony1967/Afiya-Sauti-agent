@@ -1,0 +1,59 @@
+{
+  "name": "UsageEvent",
+  "type": "object",
+  "properties": {
+    "event_id": {
+      "type": "string"
+    },
+    "profile_id": {
+      "type": "string"
+    },
+    "tenant_id": {
+      "type": "string",
+      "description": "Facility, NGO, or government entity"
+    },
+    "tenant_type": {
+      "type": "string",
+      "enum": [
+        "patient",
+        "facility",
+        "ngo",
+        "government",
+        "insurance",
+        "edge_household",
+        "api_partner"
+      ]
+    },
+    "feature_code": {
+      "type": "string",
+      "enum": [
+        "basic_triage",
+        "premium_triage",
+        "clinician_seat",
+        "government_license",
+        "api_call",
+        "edge_subscription"
+      ]
+    },
+    "quantity": {
+      "type": "number",
+      "default": 1
+    },
+    "unit_price_kes": {
+      "type": "number",
+      "default": 0
+    },
+    "total_kes": {
+      "type": "number",
+      "default": 0
+    },
+    "recorded_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "tenant_type",
+    "feature_code"
+  ]
+}

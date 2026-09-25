@@ -1,0 +1,58 @@
+{
+  "name": "Household",
+  "type": "object",
+  "properties": {
+    "household_id": {
+      "type": "string",
+      "description": "UUID - maps to Supabase UUID PK"
+    },
+    "county_code": {
+      "type": "string"
+    },
+    "sub_county": {
+      "type": "string"
+    },
+    "community_unit_id": {
+      "type": "string"
+    },
+    "anonymized_hash": {
+      "type": "string",
+      "description": "HMAC-SHA-256 with dynamic salt. Unique."
+    },
+    "chp_id": {
+      "type": "string",
+      "description": "Assigned CHP profile id"
+    },
+    "latitude": {
+      "type": "number"
+    },
+    "longitude": {
+      "type": "number"
+    },
+    "household_size": {
+      "type": "number",
+      "default": 1
+    },
+    "has_ambient_node": {
+      "type": "boolean",
+      "default": false
+    },
+    "node_device_id": {
+      "type": "string"
+    },
+    "node_subscription_active": {
+      "type": "boolean",
+      "default": false
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "county_code",
+    "sub_county",
+    "community_unit_id",
+    "anonymized_hash"
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "name": "PatientConsent",
+  "type": "object",
+  "properties": {
+    "consent_id": {
+      "type": "string"
+    },
+    "profile_id": {
+      "type": "string"
+    },
+    "household_id": {
+      "type": "string"
+    },
+    "consent_state": {
+      "type": "string",
+      "enum": [
+        "ACTIVE",
+        "REVOKED",
+        "PENDING"
+      ],
+      "default": "PENDING"
+    },
+    "purpose_code": {
+      "type": "string",
+      "enum": [
+        "triage",
+        "ambient_monitoring",
+        "research",
+        "data_sharing",
+        "caregiver_access",
+        "insurance_verification"
+      ]
+    },
+    "granted_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "revoked_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "fhir_consent_resource": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "profile_id",
+    "purpose_code"
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "name": "Protocol",
+  "type": "object",
+  "properties": {
+    "protocol_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "domain_module": {
+      "type": "string"
+    },
+    "version_number": {
+      "type": "string"
+    },
+    "content_text": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "moh_kenya",
+        "who",
+        "imci",
+        "approved_guideline"
+      ]
+    },
+    "published_by": {
+      "type": "string",
+      "description": "MoH admin profile id"
+    },
+    "target_counties": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "target_facilities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "push_sent": {
+      "type": "boolean",
+      "default": false
+    },
+    "receipt_confirmations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "ai_impact_summary": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "published",
+        "archived"
+      ],
+      "default": "draft"
+    },
+    "published_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "title",
+    "domain_module",
+    "source"
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "name": "MedicationRegimen",
+  "type": "object",
+  "properties": {
+    "regimen_id": {
+      "type": "string"
+    },
+    "profile_id": {
+      "type": "string"
+    },
+    "medication_name": {
+      "type": "string"
+    },
+    "dosage": {
+      "type": "string"
+    },
+    "frequency": {
+      "type": "string"
+    },
+    "route": {
+      "type": "string",
+      "enum": [
+        "oral",
+        "topical",
+        "injection",
+        "inhalation",
+        "sublingual",
+        "other"
+      ],
+      "default": "oral"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "prescribed_by": {
+      "type": "string"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true
+    },
+    "notes": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "profile_id",
+    "medication_name",
+    "dosage",
+    "frequency"
+  ]
+}

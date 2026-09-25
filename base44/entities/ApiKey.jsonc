@@ -1,0 +1,57 @@
+{
+  "name": "ApiKey",
+  "type": "object",
+  "properties": {
+    "key_id": {
+      "type": "string"
+    },
+    "key_name": {
+      "type": "string"
+    },
+    "key_prefix": {
+      "type": "string",
+      "description": "First 8 chars for display"
+    },
+    "key_hash": {
+      "type": "string",
+      "description": "SHA-256 hash of full key"
+    },
+    "owner_id": {
+      "type": "string"
+    },
+    "scopes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "rate_limit_per_min": {
+      "type": "number",
+      "default": 60
+    },
+    "webhook_url": {
+      "type": "string"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true
+    },
+    "last_used_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "key_name",
+    "key_hash",
+    "owner_id"
+  ]
+}

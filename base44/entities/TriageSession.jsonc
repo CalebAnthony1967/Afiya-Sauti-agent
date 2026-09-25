@@ -1,0 +1,146 @@
+{
+  "name": "TriageSession",
+  "type": "object",
+  "properties": {
+    "session_id": {
+      "type": "string"
+    },
+    "profile_id": {
+      "type": "string",
+      "description": "FK to Profile"
+    },
+    "household_id": {
+      "type": "string"
+    },
+    "channel": {
+      "type": "string",
+      "enum": [
+        "whatsapp",
+        "ivr",
+        "ussd",
+        "web",
+        "mobile",
+        "edge"
+      ]
+    },
+    "language": {
+      "type": "string",
+      "default": "sw"
+    },
+    "domain_module": {
+      "type": "string",
+      "enum": [
+        "maternal_child",
+        "ncd",
+        "infectious",
+        "mental_health",
+        "emergency",
+        "general"
+      ]
+    },
+    "symptoms_text": {
+      "type": "string"
+    },
+    "deidentified_input": {
+      "type": "string",
+      "description": "PII removed before model call"
+    },
+    "urgency_level": {
+      "type": "string",
+      "enum": [
+        "GREEN",
+        "YELLOW",
+        "RED"
+      ],
+      "default": "GREEN"
+    },
+    "red_flag_detected": {
+      "type": "boolean",
+      "default": false
+    },
+    "red_flag_details": {
+      "type": "string"
+    },
+    "icd11_codes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "citations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ai_response": {
+      "type": "string"
+    },
+    "first_aid_given": {
+      "type": "boolean",
+      "default": false
+    },
+    "chp_dispatched": {
+      "type": "boolean",
+      "default": false
+    },
+    "confidence_score": {
+      "type": "number"
+    },
+    "input_entropy": {
+      "type": "number"
+    },
+    "feature_weights": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "human_override": {
+      "type": "boolean",
+      "default": false
+    },
+    "override_reason": {
+      "type": "string"
+    },
+    "clinician_mode": {
+      "type": "boolean",
+      "default": false
+    },
+    "soap_note_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "completed",
+        "escalated",
+        "red_flag"
+      ],
+      "default": "active"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "profile_id",
+    "channel",
+    "domain_module"
+  ]
+}

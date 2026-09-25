@@ -1,0 +1,44 @@
+{
+  "name": "SecureMessage",
+  "type": "object",
+  "properties": {
+    "message_id": {
+      "type": "string"
+    },
+    "sender_id": {
+      "type": "string"
+    },
+    "recipient_id": {
+      "type": "string"
+    },
+    "subject": {
+      "type": "string"
+    },
+    "body": {
+      "type": "string"
+    },
+    "read": {
+      "type": "boolean",
+      "default": false
+    },
+    "read_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sender_role": {
+      "type": "string"
+    },
+    "recipient_role": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "sender_id",
+    "recipient_id",
+    "body"
+  ]
+}

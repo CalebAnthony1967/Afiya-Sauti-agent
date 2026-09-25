@@ -1,0 +1,74 @@
+{
+  "name": "AgentActivityLog",
+  "type": "object",
+  "properties": {
+    "log_id": {
+      "type": "string"
+    },
+    "agent_name": {
+      "type": "string",
+      "enum": [
+        "triage_agent",
+        "scribe_agent",
+        "chp_guide_agent",
+        "moh_protocol_agent",
+        "research_agent",
+        "insurance_agent",
+        "training_agent",
+        "community_intel_agent",
+        "admin_assist_agent",
+        "super_admin_agent",
+        "developer_agent"
+      ]
+    },
+    "agent_action": {
+      "type": "string"
+    },
+    "input_summary": {
+      "type": "string",
+      "description": "De-identified input summary"
+    },
+    "output_summary": {
+      "type": "string"
+    },
+    "citations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "confidence_score": {
+      "type": "number"
+    },
+    "grounded": {
+      "type": "boolean",
+      "default": true
+    },
+    "guardrail_triggered": {
+      "type": "boolean",
+      "default": false
+    },
+    "human_override": {
+      "type": "boolean",
+      "default": false
+    },
+    "session_id": {
+      "type": "string"
+    },
+    "actor_id": {
+      "type": "string"
+    },
+    "portal": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "agent_name",
+    "agent_action"
+  ]
+}

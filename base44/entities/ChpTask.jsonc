@@ -1,0 +1,99 @@
+{
+  "name": "ChpTask",
+  "type": "object",
+  "properties": {
+    "task_id": {
+      "type": "string"
+    },
+    "chp_id": {
+      "type": "string"
+    },
+    "profile_id": {
+      "type": "string"
+    },
+    "household_id": {
+      "type": "string"
+    },
+    "task_type": {
+      "type": "string",
+      "enum": [
+        "visit",
+        "follow_up",
+        "red_flag_dispatch",
+        "medication_delivery",
+        "education",
+        "vital_check"
+      ]
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "medium"
+    },
+    "description": {
+      "type": "string"
+    },
+    "guided_steps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "citations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "assigned",
+        "accepted",
+        "in_progress",
+        "completed",
+        "escalated",
+        "cancelled"
+      ],
+      "default": "assigned"
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "visit_notes": {
+      "type": "string"
+    },
+    "offline_queued": {
+      "type": "boolean",
+      "default": false
+    },
+    "sync_status": {
+      "type": "string",
+      "enum": [
+        "synced",
+        "pending",
+        "conflict"
+      ],
+      "default": "synced"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "chp_id",
+    "task_type"
+  ]
+}

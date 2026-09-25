@@ -1,0 +1,73 @@
+{
+  "name": "Facility",
+  "type": "object",
+  "properties": {
+    "facility_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "facility_type": {
+      "type": "string",
+      "enum": [
+        "dispensary",
+        "health_center",
+        "county_hospital",
+        "referral_hospital",
+        "clinic",
+        "ngo_site"
+      ]
+    },
+    "county_code": {
+      "type": "string"
+    },
+    "sub_county": {
+      "type": "string"
+    },
+    "ward": {
+      "type": "string"
+    },
+    "latitude": {
+      "type": "number"
+    },
+    "longitude": {
+      "type": "number"
+    },
+    "bed_capacity": {
+      "type": "number",
+      "default": 0
+    },
+    "beds_occupied": {
+      "type": "number",
+      "default": 0
+    },
+    "accredited": {
+      "type": "boolean",
+      "default": false
+    },
+    "accreditation_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "contact_phone": {
+      "type": "string"
+    },
+    "admin_id": {
+      "type": "string"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "name",
+    "facility_type",
+    "county_code"
+  ]
+}

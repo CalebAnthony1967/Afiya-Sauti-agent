@@ -1,0 +1,52 @@
+{
+  "name": "ChpDispatch",
+  "type": "object",
+  "properties": {
+    "dispatch_id": {
+      "type": "string"
+    },
+    "session_id": {
+      "type": "string"
+    },
+    "chp_id": {
+      "type": "string"
+    },
+    "household_id": {
+      "type": "string"
+    },
+    "reason": {
+      "type": "string"
+    },
+    "red_flag": {
+      "type": "boolean",
+      "default": false
+    },
+    "first_aid_instructions": {
+      "type": "string"
+    },
+    "dispatch_status": {
+      "type": "string",
+      "enum": [
+        "sent",
+        "acknowledged",
+        "en_route",
+        "on_site",
+        "resolved",
+        "failed"
+      ],
+      "default": "sent"
+    },
+    "dispatched_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "acknowledged_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "chp_id",
+    "reason"
+  ]
+}

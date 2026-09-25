@@ -1,0 +1,91 @@
+{
+  "name": "Profile",
+  "type": "object",
+  "properties": {
+    "full_name": {
+      "type": "string"
+    },
+    "phone_hash": {
+      "type": "string",
+      "description": "Salted SHA-256 hash of phone number. Never store raw phone."
+    },
+    "phone_last4": {
+      "type": "string",
+      "description": "Last 4 digits for display verification only"
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "patient",
+        "family",
+        "chp",
+        "clinician",
+        "ngo_admin",
+        "regional_admin",
+        "moh_admin",
+        "researcher",
+        "insurance",
+        "admin",
+        "super_admin",
+        "developer"
+      ],
+      "default": "patient"
+    },
+    "preferred_language": {
+      "type": "string",
+      "enum": [
+        "en",
+        "sw",
+        "luo",
+        "kikuyu",
+        "kalenjin",
+        "luhya",
+        "kamba",
+        "meru",
+        "maasai"
+      ],
+      "default": "sw"
+    },
+    "county_code": {
+      "type": "string"
+    },
+    "sub_county": {
+      "type": "string"
+    },
+    "community_unit_id": {
+      "type": "string"
+    },
+    "facility_id": {
+      "type": "string"
+    },
+    "ngo_id": {
+      "type": "string"
+    },
+    "consent_state": {
+      "type": "string",
+      "enum": [
+        "ACTIVE",
+        "REVOKED",
+        "PENDING"
+      ],
+      "default": "PENDING"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "vault_authenticated": {
+      "type": "boolean",
+      "default": false,
+      "description": "Super Admin vault auth flag"
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "required": [
+    "full_name",
+    "role"
+  ]
+}

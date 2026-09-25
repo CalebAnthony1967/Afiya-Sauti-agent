@@ -1,0 +1,80 @@
+{
+  "name": "OutbreakSignal",
+  "type": "object",
+  "properties": {
+    "signal_id": {
+      "type": "string"
+    },
+    "county_code": {
+      "type": "string"
+    },
+    "sub_county": {
+      "type": "string"
+    },
+    "community_unit_id": {
+      "type": "string"
+    },
+    "signal_type": {
+      "type": "string",
+      "enum": [
+        "respiratory",
+        "fever",
+        "diarrheal",
+        "maternal",
+        "other"
+      ]
+    },
+    "case_count": {
+      "type": "number",
+      "default": 0
+    },
+    "baseline_count": {
+      "type": "number",
+      "default": 0
+    },
+    "psi_drift": {
+      "type": "number",
+      "description": "Population Stability Index drift"
+    },
+    "confidence": {
+      "type": "number"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "watch",
+        "alert",
+        "outbreak"
+      ],
+      "default": "watch"
+    },
+    "ai_summary": {
+      "type": "string"
+    },
+    "citations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "detected",
+        "investigating",
+        "confirmed",
+        "resolved"
+      ],
+      "default": "detected"
+    },
+    "detected_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "county_code",
+    "signal_type"
+  ]
+}

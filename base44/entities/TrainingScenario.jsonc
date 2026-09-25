@@ -1,0 +1,62 @@
+{
+  "name": "TrainingScenario",
+  "type": "object",
+  "properties": {
+    "scenario_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "domain_module": {
+      "type": "string"
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": [
+        "beginner",
+        "intermediate",
+        "advanced"
+      ],
+      "default": "intermediate"
+    },
+    "patient_persona": {
+      "type": "string",
+      "description": "Simulated patient description"
+    },
+    "initial_complaint": {
+      "type": "string"
+    },
+    "correct_steps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "citations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "target_role": {
+      "type": "string",
+      "enum": [
+        "clinician",
+        "chp",
+        "both"
+      ],
+      "default": "both"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "title",
+    "domain_module",
+    "initial_complaint"
+  ]
+}

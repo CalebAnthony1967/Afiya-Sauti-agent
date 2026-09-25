@@ -1,0 +1,64 @@
+{
+  "name": "VitalTelemetry",
+  "type": "object",
+  "properties": {
+    "telemetry_id": {
+      "type": "string"
+    },
+    "household_id": {
+      "type": "string"
+    },
+    "device_id": {
+      "type": "string"
+    },
+    "respiratory_rate": {
+      "type": "number"
+    },
+    "heart_rate": {
+      "type": "number"
+    },
+    "cough_count_1min": {
+      "type": "number",
+      "default": 0
+    },
+    "ambient_temp_c": {
+      "type": "number"
+    },
+    "confidence_score": {
+      "type": "number"
+    },
+    "input_entropy": {
+      "type": "number"
+    },
+    "flagged_anomaly": {
+      "type": "boolean",
+      "default": false
+    },
+    "anomaly_type": {
+      "type": "string"
+    },
+    "system_state": {
+      "type": "string",
+      "enum": [
+        "PASSIVE_MONITORING",
+        "VOICE_ACTIVE",
+        "MUTED",
+        "ALERT"
+      ],
+      "default": "PASSIVE_MONITORING"
+    },
+    "fhir_payload": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "FHIR R4 Observation resource"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "household_id",
+    "device_id"
+  ]
+}
