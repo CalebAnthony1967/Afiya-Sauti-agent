@@ -5,6 +5,7 @@ import { detectRedFlag } from '@/lib/safety';
 import AIRecommendation from '@/components/AIRecommendation';
 import UrgencyBadge from '@/components/UrgencyBadge';
 import { LoadingState } from '@/components/States';
+import AudioTranscriber from '@/components/AudioTranscriber';
 import { Stethoscope, AlertTriangle, Send, Globe } from 'lucide-react';
 
 const LANGUAGES = [
@@ -130,7 +131,10 @@ export default function TriageInterface({ profileId, channel = 'web', compact = 
         </div>
 
         <div>
-          <label className="text-sm font-medium mb-1.5 block">Describe your symptoms</label>
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="text-sm font-medium">Describe your symptoms</label>
+            <span className="text-xs text-muted-foreground">Type or speak into microphone</span>
+          </div>
           <textarea
             value={symptoms}
             onChange={(e) => setSymptoms(e.target.value)}
@@ -138,6 +142,15 @@ export default function TriageInterface({ profileId, channel = 'web', compact = 
             rows={4}
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"
           />
+          <div className="mt-2.5">
+            <AudioTranscriber
+              onTranscription={(transcribedText) => {
+                setSymptoms((prev) => (prev ? `${prev} ${transcribedText}` : transcribedText));
+              }}
+              languageHint={LANGUAGES.find(l => l.code === language)?.label || 'Kiswahili'}
+              buttonLabel="Speak Symptoms (Mic Transcription)"
+            />
+          </div>
         </div>
 
         <button

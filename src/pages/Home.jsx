@@ -5,10 +5,11 @@ import {
   Heart, HeartPulse, Users, Stethoscope, Globe, TestTube,
   Shield, GraduationCap, Cpu, Monitor, LifeBuoy, MapPin, TrendingUp,
   ArrowRight, AlertTriangle, Sparkles, Activity, Radio, Lock,
-  Languages, Wifi, ChevronDown, FlaskConical, Key,
+  Languages, Wifi, ChevronDown, FlaskConical, Key, Mic
 } from 'lucide-react';
 import IngestionChannels from '@/components/ingestion/IngestionChannels';
 import LanguageSelector from '@/components/LanguageSelector';
+import VoiceTranscriptionModal from '@/components/VoiceTranscriptionModal';
 import { useLanguage } from '@/lib/LanguageContext';
 
 const PORTALS = [
@@ -46,6 +47,7 @@ const STATS = [
 export default function Home() {
   const { t } = useLanguage();
   const portalsRef = useRef(null);
+  const [transcribeModalOpen, setTranscribeModalOpen] = useState(false);
 
   const scrollToPortals = () => {
     setTimeout(() => {
@@ -55,6 +57,10 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-teal-50/30 to-white text-slate-800 overflow-x-hidden">
+      <VoiceTranscriptionModal
+        isOpen={transcribeModalOpen}
+        onClose={() => setTranscribeModalOpen(false)}
+      />
       {/* ═══ Hero Section ═══ */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* Animated light gradient orbs */}
@@ -79,7 +85,7 @@ export default function Home() {
         {/* Subtle grid overlay */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(15,118,110,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(15,118,110,0.04)_1px,transparent_1px)] bg-[size:60px_60px]" />
 
-        {/* Top bar with language selector */}
+        {/* Top bar with language selector and Voice Transcribe */}
         <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 py-4">
           <div className="flex items-center gap-2">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center shadow-md">
@@ -87,7 +93,17 @@ export default function Home() {
             </div>
             <span className="font-bold text-slate-800 text-lg">AfiyaSauti</span>
           </div>
-          <LanguageSelector />
+          <div className="flex items-center gap-2.5">
+            <button
+              type="button"
+              onClick={() => setTranscribeModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-50 text-violet-700 hover:bg-violet-100 border border-violet-200 text-xs font-semibold transition-all shadow-sm min-h-[36px]"
+            >
+              <Mic className="w-3.5 h-3.5 text-violet-600 animate-pulse" />
+              <span>Voice Transcribe</span>
+            </button>
+            <LanguageSelector />
+          </div>
         </div>
 
         {/* Content */}

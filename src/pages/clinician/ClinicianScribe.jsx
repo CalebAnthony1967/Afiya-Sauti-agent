@@ -3,6 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { generateSoapNote } from '@/lib/aiAgents';
 import AIRecommendation from '@/components/AIRecommendation';
 import { LoadingState, EmptyState } from '@/components/States';
+import AudioTranscriber from '@/components/AudioTranscriber';
 import { FileText, Save, PenLine, Lock } from 'lucide-react';
 import { signNote } from '@/lib/safety';
 
@@ -71,6 +72,13 @@ export default function ClinicianScribe() {
 
       <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-3">
         <textarea value={input} onChange={e => setInput(e.target.value)} placeholder="Dictate or type clinical encounter..." rows={5} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm resize-none" />
+        <AudioTranscriber
+          onTranscription={(text) => {
+            setInput(prev => prev ? `${prev} ${text}` : text);
+          }}
+          languageHint="English and Medical Kiswahili"
+          buttonLabel="Dictate Encounter (Microphone)"
+        />
         <button onClick={generate} disabled={loading || !input.trim()} className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium min-h-[44px] disabled:opacity-50">
           {loading ? <LoadingState message="Drafting..." /> : <><PenLine className="w-4 h-4" /> Generate Draft SOAP</>}
         </button>

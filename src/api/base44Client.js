@@ -39,6 +39,72 @@ function toTableName(entityName) {
   );
 }
 
+function resolveColumn(tableName, col) {
+  if (!col) return 'created_at';
+  if (col === 'created_date' || col === 'created_at') {
+    if (
+      tableName === 'vital_telemetry' ||
+      tableName === 'agent_activity_logs' ||
+      tableName === 'audit_logs'
+    ) {
+      return 'timestamp';
+    }
+    if (tableName === 'outbreak_signals') {
+      return 'detected_at';
+    }
+    if (tableName === 'chp_dispatches') {
+      return 'dispatched_at';
+    }
+    if (tableName === 'usage_events') {
+      return 'recorded_at';
+    }
+    if (tableName === 'patient_consents') {
+      return 'updated_at';
+    }
+    return 'created_at';
+  }
+  return col;
+}
+
+function normalizeRow(row) {
+  if (!row || typeof row !== 'object') return row;
+  const ts =
+    row.timestamp ||
+    row.detected_at ||
+    row.dispatched_at ||
+    row.recorded_at ||
+    row.created_at ||
+    row.created_date ||
+    new Date().toISOString();
+  return {
+    ...row,
+    created_date: row.created_date || ts,
+    created_at: row.created_at || ts,
+    timestamp: row.timestamp || ts,
+  };
+}
+
+function prepareRecord(tableName, payload) {
+  const record = { ...payload };
+  if (!record.id) {
+    record.id =
+      typeof crypto !== 'undefined' && crypto.randomUUID
+        ? crypto.randomUUID()
+        : 'id_' + Math.random().toString(36).substring(2, 9);
+  }
+  if (
+    tableName === 'vital_telemetry' ||
+    tableName === 'audit_logs' ||
+    tableName === 'agent_activity_logs'
+  ) {
+    if (!record.timestamp && (record.created_date || record.created_at)) {
+      record.timestamp = record.created_date || record.created_at;
+    }
+    delete record.created_date;
+  }
+  return record;
+}
+
 function createEntityHandler(entityName) {
   const tableName = toTableName(entityName);
 
@@ -46,21 +112,38 @@ function createEntityHandler(entityName) {
     async list(sort = '-created_at', limit = 100) {
       try {
         let query = supabase.from(tableName).select('*');
+        let orderedCol = null;
+        let isDesc = true;
+
         if (sort && typeof sort === 'string') {
-          const isDesc = sort.startsWith('-');
+          isDesc = sort.startsWith('-');
           const rawCol = isDesc ? sort.slice(1) : sort;
-          const col = rawCol === 'created_date' ? 'created_at' : rawCol;
-          query = query.order(col, { ascending: !isDesc });
+          orderedCol = resolveColumn(tableName, rawCol);
+          query = query.order(orderedCol, { ascending: !isDesc });
         }
         if (limit && typeof limit === 'number') {
           query = query.limit(limit);
         }
-        const { data, error } = await query;
+        let { data, error } = await query;
+
+        // If the ordering column did not exist, fallback to query without ordering
+        if (error && (error.code === '42703' || error.message?.includes('does not exist'))) {
+          let retry = supabase.from(tableName).select('*');
+          if (limit && typeof limit === 'number') {
+            retry = retry.limit(limit);
+          }
+          const retryRes = await retry;
+          if (!retryRes.error && Array.isArray(retryRes.data)) {
+            data = retryRes.data;
+            error = null;
+          }
+        }
+
         if (error) {
           console.warn(`[Supabase list ${tableName}]`, error.message);
           return [];
         }
-        return Array.isArray(data) ? data : [];
+        return Array.isArray(data) ? data.map(normalizeRow) : [];
       } catch (err) {
         console.warn(`[Supabase list ${tableName} catch]`, err);
         return [];
@@ -72,24 +155,44 @@ function createEntityHandler(entityName) {
         let query = supabase.from(tableName).select('*');
         if (criteria && typeof criteria === 'object') {
           for (const [key, value] of Object.entries(criteria)) {
-            query = query.eq(key, value);
+            const mappedKey = resolveColumn(tableName, key);
+            query = query.eq(mappedKey, value);
           }
         }
         if (sort && typeof sort === 'string') {
           const isDesc = sort.startsWith('-');
           const rawCol = isDesc ? sort.slice(1) : sort;
-          const col = rawCol === 'created_date' ? 'created_at' : rawCol;
+          const col = resolveColumn(tableName, rawCol);
           query = query.order(col, { ascending: !isDesc });
         }
         if (limit && typeof limit === 'number') {
           query = query.limit(limit);
         }
-        const { data, error } = await query;
+        let { data, error } = await query;
+
+        // Fallback without ordering if column was not found
+        if (error && (error.code === '42703' || error.message?.includes('does not exist'))) {
+          let retry = supabase.from(tableName).select('*');
+          if (criteria && typeof criteria === 'object') {
+            for (const [key, value] of Object.entries(criteria)) {
+              retry = retry.eq(resolveColumn(tableName, key), value);
+            }
+          }
+          if (limit && typeof limit === 'number') {
+            retry = retry.limit(limit);
+          }
+          const retryRes = await retry;
+          if (!retryRes.error && Array.isArray(retryRes.data)) {
+            data = retryRes.data;
+            error = null;
+          }
+        }
+
         if (error) {
           console.warn(`[Supabase filter ${tableName}]`, error.message);
           return [];
         }
-        return Array.isArray(data) ? data : [];
+        return Array.isArray(data) ? data.map(normalizeRow) : [];
       } catch (err) {
         console.warn(`[Supabase filter ${tableName} catch]`, err);
         return [];
@@ -107,7 +210,7 @@ function createEntityHandler(entityName) {
           console.warn(`[Supabase get ${tableName}]`, error.message);
           return null;
         }
-        return data || null;
+        return data ? normalizeRow(data) : null;
       } catch (err) {
         console.warn(`[Supabase get ${tableName} catch]`, err);
         return null;
@@ -116,13 +219,7 @@ function createEntityHandler(entityName) {
 
     async create(payload) {
       try {
-        const record = { ...payload };
-        if (!record.id) {
-          record.id =
-            typeof crypto !== 'undefined' && crypto.randomUUID
-              ? crypto.randomUUID()
-              : 'id_' + Math.random().toString(36).substring(2, 9);
-        }
+        const record = prepareRecord(tableName, payload);
         const { data, error } = await supabase
           .from(tableName)
           .insert([record])
@@ -130,12 +227,12 @@ function createEntityHandler(entityName) {
           .maybeSingle();
         if (error) {
           console.warn(`[Supabase insert ${tableName}]`, error.message);
-          return record;
+          return normalizeRow(record);
         }
-        return data || record;
+        return normalizeRow(data || record);
       } catch (err) {
         console.warn(`[Supabase insert ${tableName} catch]`, err);
-        return payload;
+        return normalizeRow(payload);
       }
     },
 

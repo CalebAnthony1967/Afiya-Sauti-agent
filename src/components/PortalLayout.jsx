@@ -5,9 +5,10 @@ import {
   Activity, AlertTriangle, Building2, FileText, Heart, HeartPulse, Home,
   LogOut, MapPin, Menu, MessageSquare, Shield, ShieldCheck, Stethoscope,
   TestTube, TrendingUp, User, Users, X, Globe, BookOpen, Key, GraduationCap,
-  Cpu, Monitor, LifeBuoy, BarChart, CalendarCheck, History
+  Cpu, Monitor, LifeBuoy, BarChart, CalendarCheck, History, Mic
 } from 'lucide-react';
 import LanguageSelector from '@/components/LanguageSelector';
+import VoiceTranscriptionModal from '@/components/VoiceTranscriptionModal';
 
 const NAV_GROUPS = {
   patient: [
@@ -109,6 +110,7 @@ function Pill(props) { return <svg {...props} xmlns="http://www.w3.org/2000/svg"
 export default function PortalLayout({ role, title }) {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [transcribeModalOpen, setTranscribeModalOpen] = useState(false);
   const navItems = NAV_GROUPS[role] || [];
 
   const handleLogout = async () => {
@@ -117,6 +119,12 @@ export default function PortalLayout({ role, title }) {
 
   return (
     <div className="min-h-screen bg-muted/30 flex">
+      {/* Voice Transcription Modal */}
+      <VoiceTranscriptionModal
+        isOpen={transcribeModalOpen}
+        onClose={() => setTranscribeModalOpen(false)}
+      />
+
       {/* Desktop Sidebar */}
       <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-sidebar border-r border-sidebar-border transform transition-transform duration-200 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
         <div className="flex items-center justify-between h-16 px-4 border-b border-sidebar-border">
@@ -179,6 +187,15 @@ export default function PortalLayout({ role, title }) {
             <h1 className="text-lg lg:text-xl font-heading font-semibold">{title}</h1>
           </div>
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setTranscribeModalOpen(true)}
+              title="Microphone Audio Transcription with gemini-3.5-transcribe"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-50 text-violet-700 hover:bg-violet-100 border border-violet-200 text-xs font-medium transition-colors min-h-[36px]"
+            >
+              <Mic className="w-3.5 h-3.5 text-violet-600 animate-pulse" />
+              <span className="hidden sm:inline">Voice Transcribe</span>
+            </button>
             <LanguageSelector compact />
             <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium capitalize">
               <User className="w-3 h-3" />
