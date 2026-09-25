@@ -19,7 +19,7 @@
 -- ─── 1. EXTENSIONS ─────────────────────────────────────────────────
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-CREATE EXTENSION IF NOT EXISTS "timescaledb";
+-- CREATE EXTENSION IF NOT EXISTS "timescaledb"; (Not required on Supabase)
 
 -- ─── 2. ENUMS ───────────────────────────────────────────────────────
 CREATE TYPE user_role AS ENUM (
@@ -456,9 +456,11 @@ CREATE TABLE IF NOT EXISTS support_tickets (
   resolved_at TIMESTAMPTZ
 );
 
--- ─── 4. HYPERTABLES (TimescaleDB) ───────────────────────────────────
-SELECT create_hypertable('vital_telemetry', 'timestamp', if_not_exists => true);
-SELECT create_hypertable('adherence_events', 'recorded_time', if_not_exists => true);
+-- ─── 4. TIME-SERIES PARTITIONING (Standard Postgres) ───────────────
+-- Standard PostgreSQL index-backed tables (compatible with Supabase Cloud).
+-- If running on self-hosted Postgres with TimescaleDB enabled, you may uncomment:
+-- SELECT create_hypertable('vital_telemetry', 'timestamp', if_not_exists => true);
+-- SELECT create_hypertable('adherence_events', 'recorded_time', if_not_exists => true);
 
 -- ─── 5. INDEXES ────────────────────────────────────────────────────
 CREATE INDEX IF NOT EXISTS idx_triage_sessions_profile ON triage_sessions(profile_id, created_at DESC);
