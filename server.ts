@@ -6,10 +6,12 @@
  */
 
 import express from 'express';
+import http from 'http';
 import path from 'path';
+import { WebSocketServer, WebSocket } from 'ws';
 import { createServer as createViteServer } from 'vite';
 import dotenv from 'dotenv';
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI, Modality, LiveServerMessage } from '@google/genai';
 import { executeClinicalTriage } from './src/services/channels';
 import {
   appendAuditLog,
@@ -86,6 +88,173 @@ async function startServer() {
       res.status(500).json({
         error: err?.message || 'Audio transcription failed',
         model: 'gemini-3.5-transcribe',
+      });
+    }
+  });
+
+  // Multi-Turn Chat with role system instruction and model selection
+  // Supports gemini-3.1-pro-preview for complex tasks, gemini-3.5-flash for general tasks, and gemini-3.1-flash-lite for fast tasks
+  app.post('/api/chat', async (req, res) => {
+    try {
+      const {
+        messages = [],
+        model = 'gemini-3.5-flash',
+        systemInstruction = 'You are AfiyaSauti AI Healthcare Assistant, adhering strictly to Kenya Ministry of Health protocols, Kenya DPA 2019 standards, and WHO guidelines.',
+        temperature,
+      } = req.body;
+
+      if (!Array.isArray(messages) || messages.length === 0) {
+        return res.status(400).json({ error: 'Messages array is required' });
+      }
+
+      const allowedModels = [
+        'gemini-3.5-flash',
+        'gemini-3.1-pro-preview',
+        'gemini-3.1-flash-lite',
+        'gemini-3.8-flash',
+      ];
+      const selectedModel = allowedModels.includes(model) ? model : 'gemini-3.5-flash';
+
+      const ai = getGenAI();
+
+      // Convert messages to Gemini contents structure
+      const contents = messages.map((m: any) => ({
+        role: m.role === 'assistant' ? 'model' : m.role || 'user',
+        parts: [{ text: m.content || m.text || '' }],
+      }));
+
+      const config: any = {
+        systemInstruction,
+      };
+      if (typeof temperature === 'number') {
+        config.temperature = temperature;
+      }
+
+      const response = await ai.models.generateContent({
+        model: selectedModel,
+        contents,
+        config,
+      });
+
+      const reply = response.text || '';
+      res.json({
+        reply,
+        model: selectedModel,
+        status: 'success',
+      });
+    } catch (err: any) {
+      console.error('[Chat API Error]', err);
+      res.status(500).json({
+        error: err?.message || 'Chat generation failed',
+        details: err?.toString(),
+      });
+    }
+  });
+
+  // Google Maps Grounding with gemini-3.5-flash
+  app.post('/api/grounding/maps', async (req, res) => {
+    try {
+      const { query, latitude, longitude } = req.body;
+      if (!query) {
+        return res.status(400).json({ error: 'Query is required for Maps Grounding' });
+      }
+
+      const ai = getGenAI();
+      const config: any = {
+        tools: [{ googleMaps: {} }],
+      };
+
+      if (latitude && longitude) {
+        config.toolConfig = {
+          retrievalConfig: {
+            latLng: {
+              latitude: Number(latitude),
+              longitude: Number(longitude),
+            },
+          },
+        };
+      }
+
+      const response = await ai.models.generateContent({
+        model: 'gemini-3.5-flash',
+        contents: query,
+        config,
+      });
+
+      const groundingChunks =
+        response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
+      const places: Array<{ title: string; uri: string; snippets?: any[] }> = [];
+
+      for (const chunk of groundingChunks) {
+        if ((chunk as any).maps) {
+          const mapData = (chunk as any).maps;
+          places.push({
+            title: mapData.title || 'Healthcare Facility',
+            uri: mapData.uri || '',
+            snippets: mapData.placeAnswerSources?.reviewSnippets || [],
+          });
+        }
+      }
+
+      res.json({
+        text: response.text || '',
+        places,
+        groundingChunks,
+        model: 'gemini-3.5-flash',
+        status: 'success',
+      });
+    } catch (err: any) {
+      console.error('[Maps Grounding Error]', err);
+      res.status(500).json({
+        error: err?.message || 'Maps grounding query failed',
+        model: 'gemini-3.5-flash',
+      });
+    }
+  });
+
+  // Google Search Grounding with gemini-3.5-flash
+  app.post('/api/grounding/search', async (req, res) => {
+    try {
+      const { query } = req.body;
+      if (!query) {
+        return res.status(400).json({ error: 'Query is required for Search Grounding' });
+      }
+
+      const ai = getGenAI();
+      const response = await ai.models.generateContent({
+        model: 'gemini-3.5-flash',
+        contents: query,
+        config: {
+          tools: [{ googleSearch: {} }],
+        },
+      });
+
+      const groundingChunks =
+        response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
+      const sources: Array<{ title: string; uri: string }> = [];
+
+      for (const chunk of groundingChunks) {
+        if ((chunk as any).web) {
+          const webData = (chunk as any).web;
+          sources.push({
+            title: webData.title || webData.uri || 'Clinical Source',
+            uri: webData.uri || '',
+          });
+        }
+      }
+
+      res.json({
+        text: response.text || '',
+        sources,
+        groundingChunks,
+        model: 'gemini-3.5-flash',
+        status: 'success',
+      });
+    } catch (err: any) {
+      console.error('[Search Grounding Error]', err);
+      res.status(500).json({
+        error: err?.message || 'Search grounding query failed',
+        model: 'gemini-3.5-flash',
       });
     }
   });
@@ -336,8 +505,97 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`AfiyaSauti Production Healthcare Platform listening on http://0.0.0.0:${PORT}`);
+  // Create combined HTTP & WebSocket server for Live API on /live
+  const server = http.createServer(app);
+  const wss = new WebSocketServer({ server, path: '/live' });
+
+  wss.on('connection', async (clientWs: WebSocket) => {
+    console.log('[Live Voice API] Client connected to /live');
+    let session: any = null;
+
+    try {
+      const ai = getGenAI();
+      session = await ai.live.connect({
+        model: 'gemini-3.8-live',
+        config: {
+          responseModalities: [Modality.AUDIO],
+          systemInstruction:
+            'You are AfiyaSauti AI Healthcare Voice Companion for Kenya. Speak in concise, empathetic, natural tone in English or Kiswahili as the user prefers. Provide clear first-aid, triage, and clinical guidance adhering to Ministry of Health protocols.',
+        },
+        callbacks: {
+          onmessage: (message: LiveServerMessage) => {
+            try {
+              const audio =
+                message.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
+              if (audio && clientWs.readyState === WebSocket.OPEN) {
+                clientWs.send(JSON.stringify({ audio }));
+              }
+              if (
+                message.serverContent?.interrupted &&
+                clientWs.readyState === WebSocket.OPEN
+              ) {
+                clientWs.send(JSON.stringify({ interrupted: true }));
+              }
+              const text = message.serverContent?.modelTurn?.parts?.[0]?.text;
+              if (text && clientWs.readyState === WebSocket.OPEN) {
+                clientWs.send(JSON.stringify({ text }));
+              }
+            } catch (sendErr) {
+              console.warn('[Live WebSocket Send Error]', sendErr);
+            }
+          },
+          onclose: () => {
+            console.log('[Live Voice API] Live session closed');
+          },
+          onerror: (err) => {
+            console.error('[Live Voice API Error]', err);
+            if (clientWs.readyState === WebSocket.OPEN) {
+              clientWs.send(
+                JSON.stringify({ error: err.message || 'Live session error' })
+              );
+            }
+          },
+        },
+      });
+
+      clientWs.on('message', (rawData) => {
+        try {
+          const payload = JSON.parse(rawData.toString());
+          if (payload.audio && session) {
+            // Live API expects 16kHz PCM little-endian
+            session.sendRealtimeInput({
+              audio: { data: payload.audio, mimeType: 'audio/pcm;rate=16000' },
+            });
+          } else if (payload.text && session) {
+            session.sendRealtimeInput({ text: payload.text });
+          }
+        } catch (msgErr) {
+          console.warn('[Live Client Message Parse Error]', msgErr);
+        }
+      });
+
+      clientWs.on('close', () => {
+        console.log('[Live Voice API] Client disconnected');
+        try {
+          if (session) session.close();
+        } catch {}
+      });
+    } catch (connErr: any) {
+      console.error('[Live API Connection Failed]', connErr);
+      if (clientWs.readyState === WebSocket.OPEN) {
+        clientWs.send(
+          JSON.stringify({
+            error: connErr.message || 'Failed to initialize gemini-3.8-live session',
+          })
+        );
+      }
+    }
+  });
+
+  server.listen(PORT, '0.0.0.0', () => {
+    console.log(
+      `AfiyaSauti Production Healthcare Platform listening on http://0.0.0.0:${PORT} with WebSocket /live`
+    );
   });
 }
 

@@ -5,10 +5,11 @@ import {
   Activity, AlertTriangle, Building2, FileText, Heart, HeartPulse, Home,
   LogOut, MapPin, Menu, MessageSquare, Shield, ShieldCheck, Stethoscope,
   TestTube, TrendingUp, User, Users, X, Globe, BookOpen, Key, GraduationCap,
-  Cpu, Monitor, LifeBuoy, BarChart, CalendarCheck, History, Mic
+  Cpu, Monitor, LifeBuoy, BarChart, CalendarCheck, History, Mic, Bot, Sparkles
 } from 'lucide-react';
 import LanguageSelector from '@/components/LanguageSelector';
 import VoiceTranscriptionModal from '@/components/VoiceTranscriptionModal';
+import GlobalHealthcareAgent from '@/components/ai/GlobalHealthcareAgent';
 
 const NAV_GROUPS = {
   patient: [
@@ -111,6 +112,7 @@ export default function PortalLayout({ role, title }) {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [transcribeModalOpen, setTranscribeModalOpen] = useState(false);
+  const [aiAgentOpen, setAiAgentOpen] = useState(false);
   const navItems = NAV_GROUPS[role] || [];
 
   const handleLogout = async () => {
@@ -119,6 +121,13 @@ export default function PortalLayout({ role, title }) {
 
   return (
     <div className="min-h-screen bg-muted/30 flex">
+      {/* Global AI Healthcare Agent */}
+      <GlobalHealthcareAgent
+        isOpen={aiAgentOpen}
+        onClose={() => setAiAgentOpen(false)}
+        currentRole={role}
+      />
+
       {/* Voice Transcription Modal */}
       <VoiceTranscriptionModal
         isOpen={transcribeModalOpen}
@@ -189,6 +198,15 @@ export default function PortalLayout({ role, title }) {
           <div className="flex items-center gap-2">
             <button
               type="button"
+              onClick={() => setAiAgentOpen(true)}
+              title="AfiyaSauti AI Healthcare Agent (Multi-turn Chat, Live Voice, Maps & Search Grounding)"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-teal-600 to-indigo-600 hover:from-teal-700 hover:to-indigo-700 text-white text-xs font-semibold shadow-sm transition-all min-h-[36px]"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-teal-200" />
+              <span className="hidden sm:inline">AfiyaSauti AI</span>
+            </button>
+            <button
+              type="button"
               onClick={() => setTranscribeModalOpen(true)}
               title="Microphone Audio Transcription with gemini-3.5-transcribe"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-50 text-violet-700 hover:bg-violet-100 border border-violet-200 text-xs font-medium transition-colors min-h-[36px]"
@@ -204,8 +222,22 @@ export default function PortalLayout({ role, title }) {
           </div>
         </header>
 
-        <main className="flex-1 p-4 lg:p-6 overflow-y-auto">
+        <main className="flex-1 p-4 lg:p-6 overflow-y-auto relative">
           <Outlet />
+
+          {/* Floating AI Healthcare Assistant Button */}
+          <button
+            type="button"
+            onClick={() => setAiAgentOpen(true)}
+            className="fixed bottom-6 right-6 z-40 flex items-center gap-2 px-4 py-3 rounded-full bg-gradient-to-r from-teal-600 via-indigo-600 to-violet-600 text-white shadow-xl hover:shadow-2xl hover:scale-105 transition-all border border-white/20 group"
+            title="Open AfiyaSauti AI"
+          >
+            <div className="relative">
+              <Bot className="w-5 h-5 text-white" />
+              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-teal-400 animate-ping" />
+            </div>
+            <span className="font-heading font-semibold text-xs pr-1">AfiyaSauti AI</span>
+          </button>
         </main>
       </div>
     </div>

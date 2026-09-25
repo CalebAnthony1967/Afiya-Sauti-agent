@@ -103,6 +103,9 @@ import FamilyAppointments, { FamilyMedications, FamilyEmergency } from '@/pages/
 // Community
 import CommunityHome from '@/pages/community/CommunityHome';
 
+// AI Healthcare Agent
+import HealthcareChatbot from '@/pages/HealthcareChatbot';
+
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
 
@@ -127,6 +130,8 @@ const AuthenticatedApp = () => {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/simulator" element={<Simulator />} />
+      <Route path="/ai-assistant" element={<HealthcareChatbot />} />
+      <Route path="/chatbot" element={<HealthcareChatbot />} />
 
       {/* Ambient Portal */}
       <Route element={<PortalLayout role="ambient" title="In-Home Ambient Node" />}>

@@ -5,11 +5,12 @@ import {
   Heart, HeartPulse, Users, Stethoscope, Globe, TestTube,
   Shield, GraduationCap, Cpu, Monitor, LifeBuoy, MapPin, TrendingUp,
   ArrowRight, AlertTriangle, Sparkles, Activity, Radio, Lock,
-  Languages, Wifi, ChevronDown, FlaskConical, Key, Mic
+  Languages, Wifi, ChevronDown, FlaskConical, Key, Mic, Bot
 } from 'lucide-react';
 import IngestionChannels from '@/components/ingestion/IngestionChannels';
 import LanguageSelector from '@/components/LanguageSelector';
 import VoiceTranscriptionModal from '@/components/VoiceTranscriptionModal';
+import GlobalHealthcareAgent from '@/components/ai/GlobalHealthcareAgent';
 import { useLanguage } from '@/lib/LanguageContext';
 
 const PORTALS = [
@@ -48,6 +49,7 @@ export default function Home() {
   const { t } = useLanguage();
   const portalsRef = useRef(null);
   const [transcribeModalOpen, setTranscribeModalOpen] = useState(false);
+  const [aiAgentOpen, setAiAgentOpen] = useState(false);
 
   const scrollToPortals = () => {
     setTimeout(() => {
@@ -57,6 +59,12 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-teal-50/30 to-white text-slate-800 overflow-x-hidden">
+      <GlobalHealthcareAgent
+        isOpen={aiAgentOpen}
+        onClose={() => setAiAgentOpen(false)}
+        currentRole="general"
+      />
+
       <VoiceTranscriptionModal
         isOpen={transcribeModalOpen}
         onClose={() => setTranscribeModalOpen(false)}
@@ -94,6 +102,14 @@ export default function Home() {
             <span className="font-bold text-slate-800 text-lg">AfiyaSauti</span>
           </div>
           <div className="flex items-center gap-2.5">
+            <button
+              type="button"
+              onClick={() => setAiAgentOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-teal-600 to-indigo-600 hover:from-teal-700 hover:to-indigo-700 text-white text-xs font-semibold transition-all shadow-sm min-h-[36px]"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-teal-200" />
+              <span>AfiyaSauti AI</span>
+            </button>
             <button
               type="button"
               onClick={() => setTranscribeModalOpen(true)}
@@ -159,6 +175,13 @@ export default function Home() {
             >
               {t('home.enterPortal')}
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </button>
+            <button
+              onClick={() => setAiAgentOpen(true)}
+              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-semibold text-base hover:shadow-lg hover:shadow-indigo-500/30 transition-all"
+            >
+              <Bot className="w-5 h-5 text-teal-200" />
+              <span>Launch AfiyaSauti AI (Live Voice & Maps)</span>
             </button>
             <Link
               to="/simulator"

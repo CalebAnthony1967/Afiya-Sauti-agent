@@ -1,0 +1,6 @@
+{
+  "name": "AfiyaSauti - Trusted Healthcare AI Assistant",
+  "description": "Clinically safe, auditable, privacy-first healthcare AI platform for low-resource settings across Kenya, featuring multi-channel triage, in-home ambient monitoring, and public health intelligence.",
+  "requestFramePermissions": ["microphone", "geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
